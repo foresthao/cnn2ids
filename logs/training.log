@@ -1,0 +1,94 @@
+2025-08-11 22:10:05,446 - root - INFO - ######## Training the CNN2ID model ########
+2025-08-11 22:10:05,447 - root - INFO - Loading dataset...
+2025-08-11 22:11:45,460 - root - INFO - ######## Training the CNN2ID model ########
+2025-08-11 22:11:45,460 - root - INFO - Loading dataset...
+2025-08-12 09:20:42,639 - root - INFO - ######## Training the CNN2ID model ########
+2025-08-12 09:20:42,640 - root - INFO - Loading dataset...
+2025-08-12 09:52:00,710 - root - INFO - ######## Training the CNN2ID model ########
+2025-08-12 09:52:00,711 - root - INFO - Loading dataset...
+2025-08-12 09:53:45,515 - root - INFO - ######## Training the CNN2ID model ########
+2025-08-12 09:53:45,515 - root - INFO - Loading dataset...
+2025-08-12 10:23:52,117 - root - INFO - ######## Training the CNN2ID model ########
+2025-08-12 10:23:52,124 - root - INFO - Loading dataset...
+2025-08-12 10:24:37,232 - root - INFO - ######## Training the CNN2ID model ########
+2025-08-12 10:24:37,233 - root - INFO - Loading dataset...
+2025-08-12 10:24:37,553 - root - INFO - Dataset loaded!
+2025-08-12 10:24:50,115 - root - INFO - ######## Training the CNN2ID model ########
+2025-08-12 10:24:50,115 - root - INFO - Loading dataset...
+2025-08-12 10:24:50,424 - root - INFO - Dataset loaded!
+2025-08-12 10:24:50,454 - root - INFO - start to train
+2025-08-12 10:24:50,454 - root - INFO - Epoch 1/5:
+2025-08-12 10:25:05,388 - root - INFO - ######## Training the CNN2ID model ########
+2025-08-12 10:25:05,388 - root - INFO - Loading dataset...
+2025-08-12 10:25:05,688 - root - INFO - Dataset loaded!
+2025-08-12 10:25:05,711 - root - INFO - start to train
+2025-08-12 10:25:05,712 - root - INFO - Epoch 1/5:
+2025-08-12 10:25:22,926 - root - INFO - ######## Training the CNN2ID model ########
+2025-08-12 10:25:22,927 - root - INFO - Loading dataset...
+2025-08-12 10:25:23,243 - root - INFO - Dataset loaded!
+2025-08-12 10:25:23,266 - root - INFO - start to train
+2025-08-12 10:25:23,267 - root - INFO - Epoch 1/5:
+2025-08-12 10:31:14,673 - root - INFO - loss: 0.012411397434551259 - acc: 0.9969342520042104 - val_loss: 0.023670196240681497 - val_acc: 0.995925602742832
+2025-08-12 10:31:14,673 - root - INFO - Epoch 2/5:
+2025-08-12 10:37:16,732 - root - INFO - loss: 0.007314184312611262 - acc: 0.998201913378534 - val_loss: 0.005717163333143083 - val_acc: 0.9985571274468714
+2025-08-12 10:37:16,733 - root - INFO - Epoch 3/5:
+2025-08-12 10:43:39,248 - root - INFO - loss: 0.0066225436134544746 - acc: 0.9983372680076623 - val_loss: 0.005836971804590237 - val_acc: 0.9985296441601451
+2025-08-12 10:43:39,248 - root - INFO - Epoch 4/5:
+2025-08-12 10:50:14,469 - root - INFO - loss: 0.005951005889831478 - acc: 0.9984581939707414 - val_loss: 0.004815273752064372 - val_acc: 0.9986189648420054
+2025-08-12 10:50:14,470 - root - INFO - Epoch 5/5:
+2025-08-12 10:56:42,218 - root - INFO - loss: 0.005851201909468594 - acc: 0.998446513622035 - val_loss: 0.0052826730158708314 - val_acc: 0.9986808022371395
+2025-08-12 10:56:42,219 - root - INFO - Finished Training
+2025-08-12 10:56:42,219 - root - INFO - start to Plot loss vs iterations
+2025-08-12 10:56:42,671 - root - INFO - plot confusion matrix
+2025-08-12 10:56:45,410 - root - INFO - test it
+2025-08-12 10:57:15,298 - root - INFO - ######## Training the CNN2ID model ########
+2025-08-12 10:57:15,299 - root - INFO - Loading dataset...
+2025-08-12 10:57:19,969 - root - INFO - Dataset loaded!
+2025-08-12 10:57:19,994 - root - INFO - start to train
+2025-08-12 10:57:20,028 - root - INFO - Epoch 1/5:
+2025-08-12 11:01:59,061 - root - INFO - loss: 0.012411397434551259 - acc: 0.9969342520042104 - val_loss: 0.023670196240681497 - val_acc: 0.995925602742832
+2025-08-12 11:01:59,061 - root - INFO - Epoch 2/5:
+2025-08-12 11:07:57,002 - root - INFO - loss: 0.007314184312611262 - acc: 0.998201913378534 - val_loss: 0.005717163333143083 - val_acc: 0.9985571274468714
+2025-08-12 11:07:57,003 - root - INFO - Epoch 3/5:
+2025-08-12 11:15:01,850 - root - INFO - loss: 0.0066225436134544746 - acc: 0.9983372680076623 - val_loss: 0.005836971804590237 - val_acc: 0.9985296441601451
+2025-08-12 11:15:01,851 - root - INFO - Epoch 4/5:
+2025-08-12 11:22:01,763 - root - INFO - loss: 0.005951005889831478 - acc: 0.9984581939707414 - val_loss: 0.004815273752064372 - val_acc: 0.9986189648420054
+2025-08-12 11:22:01,764 - root - INFO - Epoch 5/5:
+2025-08-12 11:29:25,234 - root - INFO - loss: 0.005851201909468594 - acc: 0.998446513622035 - val_loss: 0.0052826730158708314 - val_acc: 0.9986808022371395
+2025-08-12 11:29:25,235 - root - INFO - Finished Training
+2025-08-12 11:29:25,235 - root - INFO - start to Plot loss vs iterations
+2025-08-12 11:54:16,157 - root - INFO - ######## Training the CNN2ID model ########
+2025-08-12 11:54:16,158 - root - INFO - Loading dataset...
+2025-08-12 11:54:23,331 - root - INFO - Dataset loaded!
+2025-08-12 11:54:23,373 - root - INFO - start to train
+2025-08-12 11:54:23,373 - root - INFO - Epoch 1/5:
+2025-08-12 11:59:30,564 - root - INFO - ######## Training the CNN2ID model ########
+2025-08-12 11:59:30,564 - root - INFO - Arguments: Namespace(epochs=2, batch_size=256, lr=0.001, balanced=False, val_ratio=0.3, test_ratio=0.3)
+2025-08-12 11:59:30,564 - root - INFO - Loading dataset...
+2025-08-12 11:59:30,955 - root - INFO - Dataset loaded!
+2025-08-12 11:59:30,980 - root - INFO - start to train
+2025-08-12 11:59:30,981 - root - INFO - Epoch 1/2:
+2025-08-12 12:04:14,010 - root - INFO - loss: 0.012837457261488832 - acc: 0.9968545508012719 - val_loss: 0.007052342403313449 - val_acc: 0.9982960362229719
+2025-08-12 12:04:14,010 - root - INFO - Epoch 2/2:
+2025-08-12 12:08:20,140 - root - INFO - loss: 0.006871862664250077 - acc: 0.9982781791847941 - val_loss: 0.005370182759877947 - val_acc: 0.9986189648420054
+2025-08-12 12:08:20,140 - root - INFO - Finished Training
+2025-08-12 12:08:20,140 - root - INFO - start to Plot loss vs iterations
+2025-08-12 12:08:20,473 - root - INFO - plot confusion matrix
+2025-08-12 12:08:23,014 - root - INFO - test it
+2025-08-12 12:09:02,774 - root - INFO - Test loss: 0.00544225705710881, Test accuracy: 0.9985530099248678
+2025-08-12 12:09:03,699 - root - INFO - plot ROC
+2025-08-12 12:14:32,599 - root - INFO - ######## Training the CNN2ID model ########
+2025-08-12 12:14:32,599 - root - INFO - Arguments: Namespace(epochs=2, batch_size=256, lr=0.001, balanced=False, val_ratio=0.3, test_ratio=0.3)
+2025-08-12 12:14:32,600 - root - INFO - Loading dataset...
+2025-08-12 12:14:38,205 - root - INFO - Dataset loaded!
+2025-08-12 12:14:38,231 - root - INFO - start to train
+2025-08-12 12:14:38,232 - root - INFO - Epoch 1/2:
+2025-08-12 12:19:25,060 - root - INFO - loss: 0.012837457261488832 - acc: 0.9968545508012719 - val_loss: 0.007052342403313449 - val_acc: 0.9982960362229719
+2025-08-12 12:19:25,060 - root - INFO - Epoch 2/2:
+2025-08-12 12:24:07,389 - root - INFO - loss: 0.006871862664250077 - acc: 0.9982781791847941 - val_loss: 0.005370182759877947 - val_acc: 0.9986189648420054
+2025-08-12 12:24:07,389 - root - INFO - Finished Training
+2025-08-12 12:24:07,389 - root - INFO - start to Plot loss vs iterations
+2025-08-12 12:24:07,728 - root - INFO - plot confusion matrix
+2025-08-12 12:24:10,373 - root - INFO - test it
+2025-08-12 12:24:57,693 - root - INFO - Test loss: 0.00544225705710881, Test accuracy: 0.9985530099248678
+2025-08-12 12:24:58,621 - root - INFO - plot ROC
