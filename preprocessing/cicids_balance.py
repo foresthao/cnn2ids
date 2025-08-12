@@ -9,7 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
 
 
-DATA_DIR  = os.path.join(os.path.abspath("."), "data")
+DATA_DIR  = os.path.join(os.path.dirname(os.path.abspath(".")), "data")
 
 class CICIDS2017Preprocessor(object):
     def __init__(self, data_path, training_size, validation_size, testing_size):
@@ -67,15 +67,18 @@ class CICIDS2017Preprocessor(object):
         data_std = self.data.std(numeric_only=True)
 
         # Find Features that meet the threshold
-        constant_features = [column for column, std in data_std.iteritems() if std < threshold]
+        constant_features = [column for column, std in data_std.items() if std < threshold]
 
         # Drop the constant features
         self.data.drop(labels=constant_features, axis=1, inplace=True)
 
     def remove_correlated_features(self, threshold=0.98):
         """"""
+        # Get only numeric columns for correlation analysis
+        numeric_data = self.data.select_dtypes(include=[np.number])
+        
         # Correlation matrix
-        data_corr = self.data.corr()
+        data_corr = numeric_data.corr()
 
         # Create & Apply mask
         mask = np.triu(np.ones_like(data_corr, dtype=bool))
@@ -140,7 +143,7 @@ class CICIDS2017Preprocessor(object):
         numeric_features = self.features.select_dtypes(exclude=[object]).columns
 
         preprocessor = ColumnTransformer(transformers=[
-            ('categoricals', OneHotEncoder(drop='first', sparse=False, handle_unknown='error'), categorical_features),
+            ('categoricals', OneHotEncoder(drop='first', sparse_output=False, handle_unknown='error'), categorical_features),
             ('numericals', QuantileTransformer(), numeric_features)
         ])
 
@@ -179,7 +182,7 @@ class CICIDS2017Preprocessor(object):
         # Combine the resampled data for all classes
         resampled_data_cat = pd.concat(resampled_data)
         X_train_resampled = resampled_data_cat.drop("label", axis=1)
-        y_train_resampled = resampled_data_cat["label"]
+        y_train_resampled = pd.DataFrame(resampled_data_cat["label"], columns=["label"])
 
         return (X_train_resampled, y_train_resampled), (X_val, y_val), (X_test, y_test)
     
@@ -199,7 +202,7 @@ if __name__ == "__main__":
 
     # Remove NaN, -Inf, +Inf, Duplicates
     cicids2017.remove_duplicate_values()
-    cicids2017.remove_missing_values
+    cicids2017.remove_missing_values()
     cicids2017.remove_infinite_values()
 
     # Drop constant & correlated features
@@ -214,10 +217,10 @@ if __name__ == "__main__":
     (X_train, y_train), (X_val, y_val), (X_test, y_test) = cicids2017.scale(training_set, validation_set, testing_set)
     
     # Save the results
-    X_train.to_pickle(os.path.join(DATA_DIR, 'processed', 'train/train_features_balanced.pkl'))
-    X_val.to_pickle(os.path.join(DATA_DIR, 'processed', 'val/val_features.pkl'))
-    X_test.to_pickle(os.path.join(DATA_DIR, 'processed', 'test/test_features.pkl'))
+    X_train.to_pickle(os.path.join(DATA_DIR, 'processed1', 'train/train_features_balanced.pkl'))
+    X_val.to_pickle(os.path.join(DATA_DIR, 'processed1', 'val/val_features.pkl'))
+    X_test.to_pickle(os.path.join(DATA_DIR, 'processed1', 'test/test_features.pkl'))
 
-    y_train.to_pickle(os.path.join(DATA_DIR, 'processed', 'train/train_labels_balanced.pkl'))
-    y_val.to_pickle(os.path.join(DATA_DIR, 'processed', 'val/val_labels.pkl'))
-    y_test.to_pickle(os.path.join(DATA_DIR, 'processed', 'test/test_labels.pkl'))
+    y_train.to_pickle(os.path.join(DATA_DIR, 'processed1', 'train/train_labels_balanced.pkl'))
+    y_val.to_pickle(os.path.join(DATA_DIR, 'processed1', 'val/val_labels.pkl'))
+    y_test.to_pickle(os.path.join(DATA_DIR, 'processed1', 'test/test_labels.pkl'))

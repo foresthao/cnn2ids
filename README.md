@@ -79,6 +79,8 @@ Small validation/test subsets for faster training:
 ```bash
 python main.py --epochs 3 --val_ratio 0.1 --test_ratio 0.1
 ```
+The balanced dataset is now ready for use. To train with balanced data, use:
+python main.py --balanced --epochs [num_epochs] --batch_size [batch_size]
 
 ### Output
 
