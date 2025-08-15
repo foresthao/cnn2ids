@@ -47,7 +47,172 @@ def parse_args():
     parser.add_argument('--balanced', action='store_true', help='Use balanced dataset')
     parser.add_argument('--val_ratio', type=float, default=0.3, help='Ratio of validation subset')
     parser.add_argument('--test_ratio', type=float, default=0.3, help='Ratio of test subset')
+    parser.add_argument('--patience', type=int, default=10, help='Early stopping patience')
+    parser.add_argument('--use_scheduler', action='store_true', help='Use learning rate scheduler')
+    parser.add_argument('--grad_clip', type=float, default=1.0, help='Gradient clipping value')
     return parser.parse_args()
+
+def train_improved(
+    model: torch.nn.Module,
+    criterion: torch.nn.Module,
+    optimizer: torch.optim,
+    scheduler,
+    train_loader: torch.utils.data.DataLoader,
+    valid_loader: torch.utils.data.DataLoader,
+    num_epochs: int,
+    device: torch.device,
+    patience: int = 10,
+    grad_clip: float = 1.0
+):
+    """Train the network with improved stability features."""
+
+    model.to(device)
+    
+    history = {
+        'train': {
+            'total': 0,
+            'loss': [],
+            'accuracy': [],
+            'output_pred': [],
+            'output_true': []
+        },
+        'valid': {
+            'total': 0,
+            'loss': [],
+            'accuracy': [],
+            'output_pred': [],
+            'output_true': []
+        }
+    }
+    
+    best_val_loss = float('inf')
+    patience_counter = 0
+    best_model_state = None
+    
+    for epoch in range(1, num_epochs + 1):
+        
+        ########################################
+        ##             TRAIN LOOP             ##
+        ########################################
+        model.train()
+
+        train_loss = 0.0
+        train_steps = 0
+        train_total = 0
+        train_correct = 0
+
+        train_output_pred = []
+        train_output_true = []
+
+        logging.info(f"Epoch {epoch}/{num_epochs}:")
+        for batch_idx, (inputs, labels) in enumerate(train_loader):
+            inputs, labels = inputs.to(device), labels.to(device)
+            labels = labels.view(-1)
+            inputs = inputs.unsqueeze(1)  # Add channel dimension
+
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            
+            # Gradient clipping to prevent exploding gradients
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=grad_clip)
+            
+            optimizer.step()
+
+            train_loss += loss.cpu().item()
+            train_steps += 1
+
+            _, predicted = torch.max(outputs.data, 1)
+            train_total += labels.size(0)
+            train_correct += (predicted == labels).sum().item()
+
+            train_output_pred += outputs.argmax(1).cpu().tolist()
+            train_output_true += labels.cpu().tolist()
+            
+            # Log progress every 100 batches
+            if batch_idx % 100 == 0:
+                logging.info(f'Batch {batch_idx}/{len(train_loader)}, Loss: {loss.item():.4f}')
+
+        ########################################
+        ##             VALID LOOP             ##
+        ########################################
+        model.eval()
+
+        val_loss = 0.0
+        val_steps = 0
+        val_total = 0
+        val_correct = 0
+
+        val_output_pred = []
+        val_output_true = []
+
+        with torch.no_grad():
+            for inputs, labels in valid_loader:
+                inputs, labels = inputs.to(device), labels.to(device)
+                labels = labels.view(-1)
+                inputs = inputs.unsqueeze(1)
+
+                outputs = model(inputs)
+                loss = criterion(outputs, labels)
+                
+                val_loss += loss.cpu().item()
+                val_steps += 1
+
+                _, predicted = torch.max(outputs.data, 1)
+                val_total += labels.size(0)
+                val_correct += (predicted == labels).sum().item()
+
+                val_output_pred += outputs.argmax(1).cpu().tolist()
+                val_output_true += labels.cpu().tolist()
+
+        # Calculate averages
+        avg_train_loss = train_loss / train_steps
+        avg_val_loss = val_loss / val_steps
+        train_acc = train_correct / train_total
+        val_acc = val_correct / val_total
+        
+        # Store history
+        history['train']['total'] = train_total
+        history['train']['loss'].append(avg_train_loss)
+        history['train']['accuracy'].append(train_acc)
+        history['train']['output_pred'] = train_output_pred
+        history['train']['output_true'] = train_output_true
+
+        history['valid']['total'] = val_total
+        history['valid']['loss'].append(avg_val_loss)
+        history['valid']['accuracy'].append(val_acc)
+        history['valid']['output_pred'] = val_output_pred
+        history['valid']['output_true'] = val_output_true
+        
+        # Learning rate scheduling
+        if scheduler:
+            scheduler.step(avg_val_loss)
+        
+        logging.info(f'Epoch {epoch}: Train Loss: {avg_train_loss:.4f}, Train Acc: {train_acc:.4f}, '
+                    f'Val Loss: {avg_val_loss:.4f}, Val Acc: {val_acc:.4f}')
+        
+        # Early stopping check
+        if avg_val_loss < best_val_loss:
+            best_val_loss = avg_val_loss
+            patience_counter = 0
+            best_model_state = model.state_dict().copy()
+            logging.info(f'New best validation loss: {best_val_loss:.4f}')
+        else:
+            patience_counter += 1
+            logging.info(f'No improvement. Patience: {patience_counter}/{patience}')
+            
+            if patience_counter >= patience:
+                logging.info(f'Early stopping triggered after {epoch} epochs')
+                break
+    
+    # Load best model
+    if best_model_state:
+        model.load_state_dict(best_model_state)
+        logging.info('Loaded best model state')
+    
+    logging.info(f"Finished Training")
+    return history
 
 def main():
     args = parse_args()
@@ -106,11 +271,26 @@ def main():
     # Out loss function
     criterion = nn.CrossEntropyLoss()
 
-    # Our optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
+    # Our optimizer with weight decay
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
+    
+    # Learning rate scheduler
+    scheduler = None
+    if args.use_scheduler:
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer, mode='min', factor=0.5, patience=5, verbose=True
+        )
+    
+    # Print training parameters
+    print(f'# learning rate: {args.lr}')
+    print(f'# weight decay: {args.weight_decay}')
+    print(f'# gradient clipping: {args.grad_clip}')
+    print(f'# early stopping patience: {args.patience}')
+    print(f'# use scheduler: {args.use_scheduler}')
+    
     # Epochs
     logging.info('start to train')
-    history = train(model, criterion, optimizer, train_loader, valid_loader, args.epochs, DEVICE)
+    history = train_improved(model, criterion, optimizer, scheduler, train_loader, valid_loader, args.epochs, DEVICE, args.patience, args.grad_clip)
 
     training_loss = history['train']['loss']
     training_accuracy = history['train']['accuracy']
@@ -123,25 +303,32 @@ def main():
     valid_output_pred = history['valid']['output_pred']
 
     logging.info('start to Plot loss vs iterations')
-    fig = plt.figure(figsize=(12, 8))
-    plt.plot(training_loss, label='train - loss')
-    plt.plot(validation_loss, label='validation - loss')
-    plt.title("Train and Validation Loss")
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.legend(loc="best")
-    plt.savefig(os.path.join(IMAGE_DIR, 'Train_and_Validation_Loss.pdf'))
+    # Set font sizes for better readability
+    plt.rcParams.update({'font.size': 14})
+    
+    fig = plt.figure(figsize=(14, 10))
+    plt.plot(training_loss, label='train - loss', linewidth=2.5)
+    plt.plot(validation_loss, label='validation - loss', linewidth=2.5)
+    plt.title("Train and Validation Loss", fontsize=20, fontweight='bold')
+    plt.xlabel('Epochs', fontsize=16)
+    plt.ylabel('Loss', fontsize=16)
+    plt.legend(loc="best", fontsize=14)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(os.path.join(IMAGE_DIR, 'Train_and_Validation_Loss.pdf'), dpi=300, bbox_inches='tight')
     plt.close(fig)
 
-    fig = plt.figure(figsize=(12, 8))
-    plt.plot(training_accuracy, label='train - accuracy')
-    plt.plot(validation_accuracy, label='validation - accuracy')
-    plt.title("Train and Validation Accuracy")
-    plt.xlabel('epochs')
-    plt.ylabel('Accuracy')
+    fig = plt.figure(figsize=(14, 10))
+    plt.plot(training_accuracy, label='train - accuracy', linewidth=2.5)
+    plt.plot(validation_accuracy, label='validation - accuracy', linewidth=2.5)
+    plt.title("Train and Validation Accuracy", fontsize=20, fontweight='bold')
+    plt.xlabel('Epochs', fontsize=16)
+    plt.ylabel('Accuracy', fontsize=16)
     plt.ylim(0, 1)
-    plt.legend(loc="best")
-    plt.savefig(os.path.join(IMAGE_DIR, 'Train_and_Validation_Accuracy.pdf'))
+    plt.legend(loc="best", fontsize=14)
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(os.path.join(IMAGE_DIR, 'Train_and_Validation_Accuracy.pdf'), dpi=300, bbox_inches='tight')
     plt.close(fig)
 
     logging.info('plot confusion matrix')

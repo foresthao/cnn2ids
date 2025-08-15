@@ -55,7 +55,7 @@ The training script supports various command line arguments:
 python main.py [OPTIONS]
 ```
 
-Available options:
+#### Basic Training Parameters
 - `--epochs EPOCHS`: Number of training epochs (default: 5)
 - `--batch_size BATCH_SIZE`: Batch size for training (default: 128)
 - `--lr LR`: Learning rate (default: 0.001)
@@ -63,8 +63,40 @@ Available options:
 - `--val_ratio VAL_RATIO`: Ratio of validation subset (default: 0.3)
 - `--test_ratio TEST_RATIO`: Ratio of test subset (default: 0.3)
 
+#### Training Stability Parameters (New)
+- `--weight_decay WEIGHT_DECAY`: Weight decay (L2 regularization) coefficient (default: 1e-4)
+- `--dropout DROPOUT`: Dropout rate for regularization (default: 0.3)
+- `--patience PATIENCE`: Early stopping patience - stops training if validation loss doesn't improve (default: 10)
+- `--use_scheduler`: Enable learning rate scheduler (ReduceLROnPlateau) (default: False)
+- `--grad_clip GRAD_CLIP`: Gradient clipping value to prevent exploding gradients (default: 1.0)
+
+### Training Stability Improvements
+
+The latest version includes several improvements for training stability:
+
+#### 1. Weight Decay (L2 Regularization)
+- Prevents overfitting by penalizing large weights
+- Improves generalization performance
+- Default value: 1e-4
+
+#### 2. Learning Rate Scheduler
+- Automatically reduces learning rate when validation loss plateaus
+- Helps model converge better in later training stages
+- Use with `--use_scheduler` flag
+
+#### 3. Gradient Clipping
+- Prevents gradient explosion in deep networks
+- Improves training stability
+- Configurable via `--grad_clip` parameter
+
+#### 4. Early Stopping
+- Automatically stops training when validation loss stops improving
+- Prevents overfitting and saves training time
+- Configurable patience via `--patience` parameter
+
 ### Examples
 
+#### Basic Training
 Quick test with 2 epochs and larger batch size:
 ```bash
 python main.py --epochs 2 --batch_size 256
@@ -79,6 +111,46 @@ Small validation/test subsets for faster training:
 ```bash
 python main.py --epochs 3 --val_ratio 0.1 --test_ratio 0.1
 ```
+
+#### Advanced Training with Stability Features
+Enable learning rate scheduler and early stopping:
+```bash
+python main.py --epochs 50 --use_scheduler --patience 15
+```
+
+Use stronger regularization:
+```bash
+python main.py --epochs 50 --weight_decay 1e-3 --dropout 0.5
+```
+
+Strict gradient clipping for unstable training:
+```bash
+python main.py --epochs 50 --grad_clip 0.5 --use_scheduler
+```
+
+Complete configuration for stable training:
+```bash
+python main.py --epochs 50 --use_scheduler --weight_decay 1e-4 --grad_clip 1.0 --patience 15 --lr 0.001
+```
+
+### Parameter Recommendations
+
+#### For Unstable Training
+- Use `--use_scheduler` to enable learning rate scheduling
+- Increase `--weight_decay` to 1e-3 or 1e-2
+- Reduce `--grad_clip` to 0.5 or 0.1
+- Increase `--patience` to 15-20
+
+#### For Overfitting
+- Increase `--weight_decay` to 1e-3
+- Increase `--dropout` to 0.5
+- Reduce `--epochs` and use `--patience` for early stopping
+
+#### For Faster Training
+- Reduce `--val_ratio` and `--test_ratio` to 0.1
+- Increase `--batch_size` if memory allows
+- Use `--patience` to stop early when converged
+
 The balanced dataset is now ready for use. To train with balanced data, use:
 python main.py --balanced --epochs [num_epochs] --batch_size [batch_size]
 
