@@ -42,6 +42,8 @@ def parse_args():
     parser.add_argument('--epochs', type=int, default=5, help='Number of training epochs')
     parser.add_argument('--batch_size', type=int, default=128, help='Batch size for training')
     parser.add_argument('--lr', type=float, default=0.001, help='Learning rate')
+    parser.add_argument('--weight_decay', type=float, default=1e-4, help='Weight decay (L2 regularization)')
+    parser.add_argument('--dropout', type=float, default=0.3, help='Dropout rate')
     parser.add_argument('--balanced', action='store_true', help='Use balanced dataset')
     parser.add_argument('--val_ratio', type=float, default=0.3, help='Ratio of validation subset')
     parser.add_argument('--test_ratio', type=float, default=0.3, help='Ratio of test subset')
@@ -57,6 +59,7 @@ def main():
 
     logging.info(f'######## Training the CNN2ID model ########')
     logging.info(f'Arguments: {args}')
+    logging.info(f'Using device: {DEVICE}')
 
     logging.info("Loading dataset...")
 
