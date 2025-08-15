@@ -38,29 +38,29 @@ def get_dataset(data_path: str, balanced: bool):
 
     if balanced:
         train_data = CICIDSDataset(
-            features_file=f"{data_path}/processed1/train/train_features_balanced.pkl",
-            target_file=f"{data_path}/processed1/train/train_labels_balanced.pkl",
+            features_file=f"{data_path}/processed_fixed/train/train_features_balanced.pkl",
+            target_file=f"{data_path}/processedfixed/train/train_labels_balanced.pkl",
             transform=torch.tensor,
             target_transform=torch.tensor
         )
     else:
         train_data = CICIDSDataset(
-            features_file=f"{data_path}/processed1/train/train_features.pkl",
-            target_file=f"{data_path}/processed1/train/train_labels.pkl",
+            features_file=f"{data_path}/processed_fixed/train/train_features.pkl",
+            target_file=f"{data_path}/processed_fixed/train/train_labels.pkl",
             transform=torch.tensor,
             target_transform=torch.tensor
         )
 
     val_data = CICIDSDataset(
-        features_file=f"{data_path}/processed1/val/val_features.pkl",
-        target_file=f"{data_path}/processed1/val/val_labels.pkl",
+        features_file=f"{data_path}/processed_fixed/val/val_features.pkl",
+        target_file=f"{data_path}/processed_fixed/val/val_labels.pkl",
         transform=torch.tensor,
         target_transform=torch.tensor
     )
 
     test_data = CICIDSDataset(
-        features_file=f"{data_path}/processed1/test/test_features.pkl",
-        target_file=f"{data_path}/processed1/test/test_labels.pkl",
+        features_file=f"{data_path}/processed_fixed/test/test_features.pkl",
+        target_file=f"{data_path}/processed_fixed/test/test_labels.pkl",
         transform=torch.tensor,
         target_transform=torch.tensor
     )
